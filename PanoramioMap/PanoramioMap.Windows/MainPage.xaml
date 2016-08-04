@@ -1,0 +1,22 @@
+﻿<Page
+    x:Class="PanoramioMap.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:panoramioMap="using:PanoramioMap"
+    mc:Ignorable="d">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="150" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <panoramioMap:MapView Grid.Row="1" Credentials="AvTz-c0HoR4QVop2PS2Tgivf0DJMQ6KbG_54dvdwfmNlHP1jGEyLMYNyzFi60LKn" Zoom="10" ShowTraffic="True">
+            <interactivity:Interaction.Behaviors>
+                <panoramioMap:MapCurrentLocationOnLoadedBehavior />
+                <panoramioMap:MapPanoramioBehavior />
+            </interactivity:Interaction.Behaviors>
+        </panoramioMap:MapView>
+    </Grid>
+</Page>
