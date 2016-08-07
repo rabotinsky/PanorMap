@@ -19,5 +19,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)MapExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MapPanoramioBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MapView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PanoramioParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PhotoData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PhotoDescription.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)ImagePreviewButtonStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

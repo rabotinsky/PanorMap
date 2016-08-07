@@ -14,7 +14,7 @@
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="PanoramioMap.Windows.App">
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="PanoramioMap.App">
       <m2:VisualElements DisplayName="PanoramioMap.Windows" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="PanoramioMap.Windows" ForegroundText="light" BackgroundColor="#464646">
         <m2:SplashScreen Image="Assets\SplashScreen.png" />
       </m2:VisualElements>

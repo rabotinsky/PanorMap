@@ -7,7 +7,9 @@ using System.ComponentModel;
 using Windows.UI.Xaml.Controls;
 using Windows.Devices.Geolocation;
 using System.Collections.Generic;
+using Windows.Foundation;
 using Windows.UI;
+using Windows.UI.Xaml;
 #if WINDOWS_PHONE_APP
 using Windows.UI.Xaml.Controls.Maps;
 using Windows.UI.Xaml.Media;
@@ -38,12 +40,30 @@ namespace PanoramioMap
             _pinLayer = new MapLayer();
             _map.ShapeLayers.Add(_shapeLayer);
             _map.Children.Add(_pinLayer);
-
 #elif WINDOWS_PHONE_APP
             _map = new MapControl();
 #endif
 
             this.Children.Add(_map);
+        }
+
+        public void AddUIElement(UIElement element)
+        {
+#if WINDOWS_APP
+            _pinLayer.Children.Add(element);
+#elif WINDOWS_PHONE_APP
+#endif
+        }
+
+        public void MoveUiElement(BasicGeoposition location, UIElement element)
+        {
+#if WINDOWS_APP
+            _pinLayer.Children.Remove(element);
+            _pinLayer.Children.Add(element);
+            MapLayer.SetPosition(element, location.ToLocation());
+            //_pinLayer.InvalidateArrange();
+#elif WINDOWS_PHONE_APP
+#endif
         }
 
         public void AddPushpin(BasicGeoposition location, string text)
@@ -279,6 +299,57 @@ namespace PanoramioMap
         public void UnsubscribeViewChanged(EventHandler<EventArgs> eventHandler)
         {
             //TODO create UnsubscribeViewChanged
+        }
+
+        public bool GetBoundLocations(out Geopoint topLeft, out Geopoint bottomRight)
+        {
+#if WINDOWS_APP
+            Location tl;
+            Location br;
+            var rtl = _map.TryPixelToLocation(new Point(0, 0), out tl);
+            var rbr = _map.TryPixelToLocation(new Point(ActualWidth, ActualHeight), out br);
+            topLeft = new Geopoint(new BasicGeoposition
+            {
+                Latitude = tl.Latitude,
+                Longitude = tl.Longitude
+            });
+            bottomRight = new Geopoint(new BasicGeoposition
+            {
+                Latitude = br.Latitude,
+                Longitude = br.Longitude
+            });
+            return rtl && rbr;
+#elif WINDOWS_PHONE_APP
+            _map.GetLocationFromOffset(new Point(0, 0), out topLeft);
+            _map.GetLocationFromOffset(new Point(ActualWidth, ActualHeight), out bottomRight);
+            return true;
+#endif
+        }
+
+        public Point LocationToPixel(Geopoint geopoint)
+        {
+            Point point;
+#if WINDOWS_APP
+            _map.TryLocationToPixel(new Location(geopoint.Position.Latitude, geopoint.Position.Longitude), out point);
+#elif WINDOWS_PHONE_APP
+
+#endif
+            return point;
+        }
+
+        public Geopoint PixelToLocation(Point point)
+        {
+#if WINDOWS_APP
+            Location location = null;
+            _map.TryPixelToLocation(point, out location);
+            if (location != null)
+            {
+                return new Geopoint(new BasicGeoposition { Latitude = location.Latitude, Longitude = location.Longitude });
+            }
+#elif WINDOWS_PHONE_APP
+
+#endif
+            return default(Geopoint);
         }
     }
 }
