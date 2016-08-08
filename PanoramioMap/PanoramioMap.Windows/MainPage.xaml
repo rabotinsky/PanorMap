@@ -8,11 +8,7 @@
     xmlns:panoramioMap="using:PanoramioMap"
     mc:Ignorable="d">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="150" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <panoramioMap:MapView Grid.Row="1" Credentials="AvTz-c0HoR4QVop2PS2Tgivf0DJMQ6KbG_54dvdwfmNlHP1jGEyLMYNyzFi60LKn" Zoom="10" ShowTraffic="True">
+        <panoramioMap:MapView Credentials="AvTz-c0HoR4QVop2PS2Tgivf0DJMQ6KbG_54dvdwfmNlHP1jGEyLMYNyzFi60LKn" Zoom="10" ShowTraffic="True">
             <interactivity:Interaction.Behaviors>
                 <panoramioMap:MapCurrentLocationOnLoadedBehavior />
                 <panoramioMap:MapPanoramioBehavior />

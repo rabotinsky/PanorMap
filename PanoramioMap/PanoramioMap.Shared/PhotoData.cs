@@ -4,7 +4,8 @@ namespace PanoramioMap
 {
     public class PhotoData
     {
-        public PhotoDescription Description { get; set; }
+        public PhotoDescription MiniSquareSizeDescription { get; set; }
         public BitmapImage MiniSquareImage { get; set; }
+        public PhotoDescription OriginalSizeDescription { get; set; }
     }
 }
