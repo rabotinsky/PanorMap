@@ -13,14 +13,20 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
-        <panoramioMap:MapView Credentials="AvTz-c0HoR4QVop2PS2Tgivf0DJMQ6KbG_54dvdwfmNlHP1jGEyLMYNyzFi60LKn" Zoom="10" ShowTraffic="True">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <panoramioMap:MapView Grid.ColumnSpan="2" Credentials="AvTz-c0HoR4QVop2PS2Tgivf0DJMQ6KbG_54dvdwfmNlHP1jGEyLMYNyzFi60LKn" Zoom="10" ShowTraffic="True">
             <interactivity:Interaction.Behaviors>
                 <panoramioMap:MapCurrentLocationOnLoadedBehavior />
                 <panoramioMap:MapPanoramioBehavior LoadingProgressBar="{Binding ElementName=LoadingProgressBar}"
-                                                   LoadingTextBlock="{Binding ElementName=LoadingTextBlock}" />
+                                                   LoadingTextBlock="{Binding ElementName=LoadingTextBlock}"
+                                                   LoadingProgressRing="{Binding ElementName=LoadingProgressRing}"/>
             </interactivity:Interaction.Behaviors>
         </panoramioMap:MapView>
-        <ProgressBar x:Name="LoadingProgressBar" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
-        <TextBlock x:Name="LoadingTextBlock" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
+        <ProgressBar x:Name="LoadingProgressBar" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  />
+        <ProgressRing x:Name="LoadingProgressRing" Grid.Row="1" Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        <TextBlock x:Name="LoadingTextBlock" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
     </Grid>
 </Page>

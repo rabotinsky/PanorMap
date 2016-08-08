@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using System.Net;
 using Windows.Devices.Geolocation;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -17,6 +17,7 @@ namespace PanoramioMap
     /// </summary>
     public class MapPanoramioBehavior : DependencyObject, IBehavior
     {
+        private readonly object _lock = new object();
         private const int ButtonsCountOnMap = 70;
         private MapView _mapView;
         private readonly Dictionary<string, PhotoData> _photoUrlToPhotoData = new Dictionary<string, PhotoData>();
@@ -38,77 +39,109 @@ namespace PanoramioMap
 
         async private void ChangeViewEventHandler(object sender, EventArgs eventArgs)
         {
+            LoadingTextBlock.Text = "Loading photos info";
+            LoadingProgressRing.IsActive = true;
             LoadingProgressBar.Value = 0;
             _mapView.ClearMap();
             Geopoint topLeft;
             Geopoint bottomRight;
             _mapView.GetBoundLocations(out topLeft, out bottomRight);
-            LoadingTextBlock.Text = "Loading photo previews info";
-            var photoDescriptionsMiniSquare = await PanoramioApi.RequestPhotos(ButtonsCountOnMap, "mini_square", topLeft, bottomRight);
-            LoadingTextBlock.Text = "Loading original photos info";
-            var photoDescriptionsOriginal = await PanoramioApi.RequestPhotos(ButtonsCountOnMap, "original", topLeft, bottomRight);
-            LoadingTextBlock.Text = "Loading photo previews";
-            var originalPhotosDict = photoDescriptionsOriginal.ToDictionary(x => x.PhotoUrl, x => x);
-            var previewsLoadedCount = 0;
-            LoadingProgressBar.Maximum = photoDescriptionsMiniSquare.Count - 1;
-            LoadingProgressBar.Value = 0;
-            foreach (var photoDescription in photoDescriptionsMiniSquare)
+            try
             {
-                if (!originalPhotosDict.ContainsKey(photoDescription.PhotoUrl))
+                var photoDescriptionsMiniSquare =
+                    await PanoramioApi.RequestPhotos(ButtonsCountOnMap, "mini_square", topLeft, bottomRight);
+                var photoDescriptionsOriginal =
+                    await PanoramioApi.RequestPhotos(ButtonsCountOnMap, "original", topLeft, bottomRight);
+                LoadingTextBlock.Text = "Loading photo previews";
+                var originalPhotosDict = photoDescriptionsOriginal.ToDictionary(x => x.PhotoUrl, x => x);
+                var previewsLoadedCount = 0;
+                LoadingProgressBar.Maximum = photoDescriptionsMiniSquare.Count - 1;
+                LoadingProgressBar.Value = 0;
+                Action updateLoadedPreviewsCount = delegate
                 {
-                    continue;
-                }
-                if (!_photoUrlToPhotoData.ContainsKey(photoDescription.PhotoUrl))
-                {
-                    var bi = new BitmapImage { UriSource = new Uri(photoDescription.PhotoFileUrl) };
-                    bi.ImageOpened += delegate
+                    lock (_lock)
                     {
-                        Interlocked.Increment(ref previewsLoadedCount);
+                        previewsLoadedCount++;
                         LoadingProgressBar.Value = previewsLoadedCount;
-                    };
-                    bi.ImageFailed += delegate
-                    {
-                        Interlocked.Increment(ref previewsLoadedCount);
-                        LoadingProgressBar.Value = previewsLoadedCount;
-                    };
-                    _photoUrlToPhotoData[photoDescription.PhotoUrl] = new PhotoData
-                    {
-                        MiniSquareSizeDescription = photoDescription,
-                        MiniSquareImage = bi,
-                        OriginalSizeDescription = originalPhotosDict[photoDescription.PhotoUrl]
-                    };
-                }
-                else
-                {
-                    Interlocked.Increment(ref previewsLoadedCount);
-                    LoadingProgressBar.Value = previewsLoadedCount;
-                }
-                var photoData = _photoUrlToPhotoData[photoDescription.PhotoUrl];
-                var button = new Button
-                {
-                    Background = new SolidColorBrush(Colors.White),
-                    BorderBrush = new SolidColorBrush(Colors.Gray),
-                    Padding = new Thickness(0),
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    VerticalContentAlignment = VerticalAlignment.Center,
-                    Style = Application.Current.Resources["ImagePreviewButtonStyle"] as Style,
-                    Tag = photoData
+                        if (previewsLoadedCount == photoDescriptionsMiniSquare.Count)
+                        {
+                            LoadingTextBlock.Text = "Done";
+                            LoadingProgressRing.IsActive = false;
+                        }
+                    }
                 };
-                button.Tapped += PreviewImageButtonTapped;
-                var photoGeoposition = new BasicGeoposition {Latitude = photoDescription.Latitude, Longitude = photoDescription.Longitude };
-                var img = new Image
+                foreach (var photoDescription in photoDescriptionsMiniSquare)
                 {
-                    Source = photoData.MiniSquareImage,
-                    Width = photoDescription.Width,
-                    Height = photoDescription.Height,
-                };
-                button.Content = img;
-                button.Width = photoDescription.Width + 10;
-                button.Height = photoDescription.Height + 20;
-                button.Margin = new Thickness(-button.Width / 2, -button.Height, 0, 0);
-                _mapView.MoveUiElement(photoGeoposition, button);
+                    if (!originalPhotosDict.ContainsKey(photoDescription.PhotoUrl))
+                    {
+                        continue;
+                    }
+                    if (!_photoUrlToPhotoData.ContainsKey(photoDescription.PhotoUrl))
+                    {
+                        var bi = new BitmapImage {UriSource = new Uri(photoDescription.PhotoFileUrl)};
+                        bi.ImageOpened += delegate
+                        {
+                            updateLoadedPreviewsCount();
+                        };
+                        bi.ImageFailed += delegate
+                        {
+                            updateLoadedPreviewsCount();
+                        };
+                        _photoUrlToPhotoData[photoDescription.PhotoUrl] = new PhotoData
+                        {
+                            MiniSquareSizeDescription = photoDescription,
+                            MiniSquareImage = bi,
+                            OriginalSizeDescription = originalPhotosDict[photoDescription.PhotoUrl]
+                        };
+                    }
+                    else
+                    {
+                        updateLoadedPreviewsCount();
+                    }
+                    var photoData = _photoUrlToPhotoData[photoDescription.PhotoUrl];
+                    var button = new Button
+                    {
+                        Background = new SolidColorBrush(Colors.White),
+                        BorderBrush = new SolidColorBrush(Colors.Gray),
+                        Padding = new Thickness(0),
+                        HorizontalContentAlignment = HorizontalAlignment.Center,
+                        VerticalContentAlignment = VerticalAlignment.Center,
+                        Style = Application.Current.Resources["ImagePreviewButtonStyle"] as Style,
+                        Tag = photoData
+                    };
+                    button.Tapped += PreviewImageButtonTapped;
+                    var photoGeoposition = new BasicGeoposition
+                    {
+                        Latitude = photoDescription.Latitude,
+                        Longitude = photoDescription.Longitude
+                    };
+                    var img = new Image
+                    {
+                        Source = photoData.MiniSquareImage,
+                        Width = photoDescription.Width,
+                        Height = photoDescription.Height,
+                    };
+                    button.Content = img;
+                    button.Width = photoDescription.Width + 10;
+                    button.Height = photoDescription.Height + 20;
+                    button.Margin = new Thickness(-button.Width/2, -button.Height, 0, 0);
+                    _mapView.MoveUiElement(photoGeoposition, button);
+                }
             }
-            LoadingTextBlock.Text = string.Empty;
+            catch (WebException)
+            {
+                ShowErrorMessage("Unagle to connect to server");
+            }
+            catch (Exception)
+            {
+                ShowErrorMessage("Undefined error");
+            }
+        }
+
+        private void ShowErrorMessage(string message)
+        {
+            LoadingTextBlock.Text = message;
+            LoadingProgressRing.IsActive = false;
         }
 
         private static void PreviewImageButtonTapped(object sender, RoutedEventArgs e)
@@ -143,6 +176,15 @@ namespace PanoramioMap
         {
             get { return (TextBlock) GetValue(LoadingTextBlockProperty); }
             set { SetValue(LoadingTextBlockProperty, value); }
+        }
+
+        public static readonly DependencyProperty LoadingProgressRingProperty = DependencyProperty.Register(
+            "LoadingProgressRing", typeof (ProgressRing), typeof (MapPanoramioBehavior), new PropertyMetadata(default(ProgressRing)));
+
+        public ProgressRing LoadingProgressRing
+        {
+            get { return (ProgressRing) GetValue(LoadingProgressRingProperty); }
+            set { SetValue(LoadingProgressRingProperty, value); }
         }
     }
 }
