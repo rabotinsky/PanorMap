@@ -5,7 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:panoramioMap="using:PanoramioMap"
     xmlns:behaviors="using:PanoramioMap.Behaviors"
     mc:Ignorable="d">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
@@ -20,15 +19,24 @@
         </Grid.ColumnDefinitions>
         <Button Content="Back" Margin="5">
             <interactivity:Interaction.Behaviors>
-                <behaviors:MoveToMainPageBehavior />
+                <behaviors:MoveToPreviousPageBehavior />
             </interactivity:Interaction.Behaviors>
         </Button>
         <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding OriginalSizeDescription.PhotoTitle}"
                    HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="5" />
         <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Stretch="Uniform">
             <Image.Source>
-                <BitmapImage UriSource="{Binding OriginalSizeDescription.PhotoFileUrl}" />
+                <BitmapImage UriSource="{Binding OriginalSizeDescription.PhotoFileUrl}">
+                    <interactivity:Interaction.Behaviors>
+                        <behaviors:ImageLoadingBehavior LoadingProgressRing="{Binding ElementName=LoadingProgressRing}"
+                                                        FailedTextBlock="{Binding ElementName=FailedTextBlock}" />
+                    </interactivity:Interaction.Behaviors>
+                </BitmapImage>
             </Image.Source>
         </Image>
+        <ProgressRing x:Name="LoadingProgressRing" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsActive="True"
+                      HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" Height="200" />
+        <TextBlock x:Name="FailedTextBlock" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Failed to load photo"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="5" Visibility="Collapsed" />
     </Grid>
 </Page>

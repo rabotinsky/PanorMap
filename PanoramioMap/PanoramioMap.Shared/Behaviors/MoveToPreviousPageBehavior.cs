@@ -5,7 +5,7 @@ using Microsoft.Xaml.Interactivity;
 
 namespace PanoramioMap.Behaviors
 {
-    public class MoveToMainPageBehavior : DependencyObject, IBehavior
+    public class MoveToPreviousPageBehavior : DependencyObject, IBehavior
     {
         private UIElement _element;
 

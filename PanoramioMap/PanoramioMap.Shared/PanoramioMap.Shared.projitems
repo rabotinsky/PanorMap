@@ -15,9 +15,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Behaviors\ImageLoadingBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Behaviors\MapCurrentLocationOnLoadedBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Behaviors\MapPanoramioBehavior.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Behaviors\MoveToMainPageBehavior.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Behaviors\MoveToPreviousPageBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ImageViewPage.xaml.cs">
       <DependentUpon>ImageViewPage.xaml</DependentUpon>
     </Compile>
