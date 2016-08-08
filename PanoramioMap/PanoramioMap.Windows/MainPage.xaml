@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:panoramioMap="using:PanoramioMap"
+    NavigationCacheMode="Required"
     mc:Ignorable="d">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <panoramioMap:MapView Credentials="AvTz-c0HoR4QVop2PS2Tgivf0DJMQ6KbG_54dvdwfmNlHP1jGEyLMYNyzFi60LKn" Zoom="10" ShowTraffic="True">

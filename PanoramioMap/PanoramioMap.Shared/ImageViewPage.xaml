@@ -4,8 +4,31 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:panoramioMap="using:PanoramioMap"
+    xmlns:behaviors="using:PanoramioMap.Behaviors"
     mc:Ignorable="d">
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+          HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Button Content="Back" Margin="5">
+            <interactivity:Interaction.Behaviors>
+                <behaviors:MoveToMainPageBehavior />
+            </interactivity:Interaction.Behaviors>
+        </Button>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding OriginalSizeDescription.PhotoTitle}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="5" />
+        <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Stretch="Uniform">
+            <Image.Source>
+                <BitmapImage UriSource="{Binding OriginalSizeDescription.PhotoFileUrl}" />
+            </Image.Source>
+        </Image>
     </Grid>
 </Page>

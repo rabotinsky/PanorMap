@@ -15,17 +15,18 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Behaviors\MapCurrentLocationOnLoadedBehavior.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Behaviors\MapPanoramioBehavior.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Behaviors\MoveToMainPageBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ImageViewPage.xaml.cs">
       <DependentUpon>ImageViewPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)MapCurrentLocationOnLoadedBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MapExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MapPanoramioBehavior.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MapView.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PanoramioApi.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PanoramioParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Panoramio\PanoramioApi.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Panoramio\PanoramioParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Panoramio\PhotoDescription.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PhotoData.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PhotoDescription.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)ImagePreviewButtonStyle.xaml">

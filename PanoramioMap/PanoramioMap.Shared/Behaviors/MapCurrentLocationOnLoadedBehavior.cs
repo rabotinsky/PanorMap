@@ -35,7 +35,10 @@ namespace PanoramioMap
 
         async private void MapViewOnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-
+            if (_mapView.Center.Position.Latitude != 0 || _mapView.Center.Position.Longitude != 0)
+            {
+                return;
+            }
             var geolocator = new Geolocator();
             Geoposition geoposition = null;
             try
