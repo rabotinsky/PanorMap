@@ -12,19 +12,14 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Button Content="Back" Margin="5">
+        <Button Content="Back" Margin="5" HorizontalAlignment="Left">
             <interactivity:Interaction.Behaviors>
                 <behaviors:MoveToPreviousPageBehavior />
             </interactivity:Interaction.Behaviors>
         </Button>
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding OriginalSizeDescription.PhotoTitle}"
-                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="5" />
-        <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Stretch="Uniform">
+        <Image Grid.Row="1" Grid.Column="0" Stretch="Uniform">
             <Image.Source>
                 <BitmapImage UriSource="{Binding OriginalSizeDescription.PhotoFileUrl}">
                     <interactivity:Interaction.Behaviors>
@@ -38,5 +33,7 @@
                       HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" Height="200" />
         <TextBlock x:Name="FailedTextBlock" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Failed to load photo"
                    HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="5" Visibility="Collapsed" />
+        <TextBlock Grid.Row="2" Text="{Binding OriginalSizeDescription.PhotoTitle}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="5" />
     </Grid>
 </Page>
