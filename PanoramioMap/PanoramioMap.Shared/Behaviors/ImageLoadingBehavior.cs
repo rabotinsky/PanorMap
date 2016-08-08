@@ -29,6 +29,8 @@ namespace PanoramioMap.Behaviors
 
         public void Detach()
         {
+            _bitmapImage.ImageOpened -= ImageOpened;
+            _bitmapImage.ImageFailed -= ImageFailed;
             _bitmapImage = null;
         }
 

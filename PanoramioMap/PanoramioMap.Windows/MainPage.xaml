@@ -9,11 +9,18 @@
     NavigationCacheMode="Required"
     mc:Ignorable="d">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
         <panoramioMap:MapView Credentials="AvTz-c0HoR4QVop2PS2Tgivf0DJMQ6KbG_54dvdwfmNlHP1jGEyLMYNyzFi60LKn" Zoom="10" ShowTraffic="True">
             <interactivity:Interaction.Behaviors>
                 <panoramioMap:MapCurrentLocationOnLoadedBehavior />
-                <panoramioMap:MapPanoramioBehavior />
+                <panoramioMap:MapPanoramioBehavior LoadingProgressBar="{Binding ElementName=LoadingProgressBar}"
+                                                   LoadingTextBlock="{Binding ElementName=LoadingTextBlock}" />
             </interactivity:Interaction.Behaviors>
         </panoramioMap:MapView>
+        <ProgressBar x:Name="LoadingProgressBar" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        <TextBlock x:Name="LoadingTextBlock" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
     </Grid>
 </Page>

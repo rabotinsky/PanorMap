@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Windows.Devices.Geolocation;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -37,13 +38,20 @@ namespace PanoramioMap
 
         async private void ChangeViewEventHandler(object sender, EventArgs eventArgs)
         {
+            LoadingProgressBar.Value = 0;
             _mapView.ClearMap();
             Geopoint topLeft;
             Geopoint bottomRight;
             _mapView.GetBoundLocations(out topLeft, out bottomRight);
+            LoadingTextBlock.Text = "Loading photo previews info";
             var photoDescriptionsMiniSquare = await PanoramioApi.RequestPhotos(ButtonsCountOnMap, "mini_square", topLeft, bottomRight);
+            LoadingTextBlock.Text = "Loading original photos info";
             var photoDescriptionsOriginal = await PanoramioApi.RequestPhotos(ButtonsCountOnMap, "original", topLeft, bottomRight);
+            LoadingTextBlock.Text = "Loading photo previews";
             var originalPhotosDict = photoDescriptionsOriginal.ToDictionary(x => x.PhotoUrl, x => x);
+            var previewsLoadedCount = 0;
+            LoadingProgressBar.Maximum = photoDescriptionsMiniSquare.Count - 1;
+            LoadingProgressBar.Value = 0;
             foreach (var photoDescription in photoDescriptionsMiniSquare)
             {
                 if (!originalPhotosDict.ContainsKey(photoDescription.PhotoUrl))
@@ -53,12 +61,27 @@ namespace PanoramioMap
                 if (!_photoUrlToPhotoData.ContainsKey(photoDescription.PhotoUrl))
                 {
                     var bi = new BitmapImage { UriSource = new Uri(photoDescription.PhotoFileUrl) };
+                    bi.ImageOpened += delegate
+                    {
+                        Interlocked.Increment(ref previewsLoadedCount);
+                        LoadingProgressBar.Value = previewsLoadedCount;
+                    };
+                    bi.ImageFailed += delegate
+                    {
+                        Interlocked.Increment(ref previewsLoadedCount);
+                        LoadingProgressBar.Value = previewsLoadedCount;
+                    };
                     _photoUrlToPhotoData[photoDescription.PhotoUrl] = new PhotoData
                     {
                         MiniSquareSizeDescription = photoDescription,
                         MiniSquareImage = bi,
                         OriginalSizeDescription = originalPhotosDict[photoDescription.PhotoUrl]
                     };
+                }
+                else
+                {
+                    Interlocked.Increment(ref previewsLoadedCount);
+                    LoadingProgressBar.Value = previewsLoadedCount;
                 }
                 var photoData = _photoUrlToPhotoData[photoDescription.PhotoUrl];
                 var button = new Button
@@ -85,6 +108,7 @@ namespace PanoramioMap
                 button.Margin = new Thickness(-button.Width / 2, -button.Height, 0, 0);
                 _mapView.MoveUiElement(photoGeoposition, button);
             }
+            LoadingTextBlock.Text = string.Empty;
         }
 
         private static void PreviewImageButtonTapped(object sender, RoutedEventArgs e)
@@ -102,5 +126,23 @@ namespace PanoramioMap
         }
 
         public DependencyObject AssociatedObject => _mapView;
+
+        public static readonly DependencyProperty LoadingProgressBarProperty = DependencyProperty.Register(
+            "LoadingProgressBar", typeof (ProgressBar), typeof (MapPanoramioBehavior), new PropertyMetadata(default(ProgressBar)));
+
+        public ProgressBar LoadingProgressBar
+        {
+            get { return (ProgressBar) GetValue(LoadingProgressBarProperty); }
+            set { SetValue(LoadingProgressBarProperty, value); }
+        }
+
+        public static readonly DependencyProperty LoadingTextBlockProperty = DependencyProperty.Register(
+            "LoadingTextBlock", typeof (TextBlock), typeof (MapPanoramioBehavior), new PropertyMetadata(default(TextBlock)));
+
+        public TextBlock LoadingTextBlock
+        {
+            get { return (TextBlock) GetValue(LoadingTextBlockProperty); }
+            set { SetValue(LoadingTextBlockProperty, value); }
+        }
     }
 }
